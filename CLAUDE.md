@@ -23,9 +23,22 @@ python3 -m pytest tests/unit/domain/test_nik_entity.py -v
 # Run without coverage
 python3 -m pytest --no-cov
 
+# Lint and format
+ruff check .
+ruff format .
+
+# Type check
+mypy .
+
+# Standalone NIK parser CLI
+python nik_parser.py 3201010101010001
+python nik_parser.py 3201010101010001 --tanggal-lahir 1985-01-01 --json
+
 # Docker
 docker-compose up
 ```
+
+**Python version**: 3.11+ required
 
 ## Architecture
 
@@ -122,7 +135,21 @@ docker-compose up
 | `ALLOWED_ORIGINS` | Comma-separated CORS origins | (no CORS allowed) |
 | `DB_PATH` | Path to regions.db | `data/regions.db` |
 
-**Note:** `.env` file is auto-loaded via `python-dotenv`.
+**Note:** `.env` file is auto-loaded via `python-dotenv` (listed in requirements.txt).
+
+## Standalone CLI
+
+`nik_parser.py` is a standalone NIK parser with no external dependencies beyond the region DB. Useful for:
+- Quick CLI parsing without running the API server
+- Testing/debugging NIK parsing logic
+- Integration into other scripts
+
+```bash
+python nik_parser.py 3201010101010001
+python nik_parser.py 3201010101010001 --tanggal-lahir 1985-01-01 --json
+```
+
+Contains duplicate logic from `core/` and `infrastructure/` - keep changes in sync if modifying parsing behavior.
 
 ## Authentication
 

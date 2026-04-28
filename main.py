@@ -1,6 +1,8 @@
 from fastapi import FastAPI, Security
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security.api_key import APIKeyHeader
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from api.routes.nik import router as nik_router
@@ -18,10 +20,11 @@ api_key_scheme = APIKeyHeader(name="X-API-Key", auto_error=False)
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """Add security headers to all responses.
-    Skips CSP for docs endpoints to allow Swagger UI.
+    Skips/modifies CSP for docs and UI endpoints.
     """
 
-    _DOCS_PATHS = {"/docs", "/redoc", "/openapi.json"}
+    _SKIP_CSP_PATHS = {"/docs", "/redoc", "/openapi.json", "/", "/static"}
+    _UI_CSP = "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'"
 
     async def dispatch(self, request: Request, call_next):
         response = await call_next(request)
@@ -30,8 +33,14 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
 
-        # Only apply CSP to API endpoints, not docs
-        if request.url.path not in self._DOCS_PATHS:
+        # Skip CSP for docs, use relaxed CSP for UI, strict for API
+        path = request.url.path
+        if path in self._SKIP_CSP_PATHS or path.startswith("/static"):
+            if path == "/" or path.startswith("/static"):
+                response.headers["Content-Security-Policy"] = self._UI_CSP
+            # No CSP for docs
+        else:
+            # Strict CSP for API endpoints
             response.headers["Content-Security-Policy"] = "default-src 'self'"
         return response
 
@@ -77,11 +86,12 @@ app.include_router(nik_router)
 
 @app.get("/")
 async def root():
-    return {
-        "service": "Validasi NIK API",
-        "version": "1.0.0",
-        "docs": "/docs"
-    }
+    """Serve the web interface"""
+    return FileResponse("static/index.html")
+
+
+# Mount static files for CSS/JS if needed later
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 # For serverless deployment

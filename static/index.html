@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validasi NIK</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --uber-black: #000000;
+            --pure-white: #ffffff;
+            --hover-gray: #e2e2e2;
+            --hover-light: #f3f3f3;
+            --chip-gray: #efefef;
+            --body-gray: #4b4b4b;
+            --muted-gray: #afafaf;
+            --shadow-light: rgba(0, 0, 0, 0.12);
+            --shadow-medium: rgba(0, 0, 0, 0.16);
+            --success: #00a651;
+            --error: #e31837;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+            background: var(--pure-white);
+            color: var(--uber-black);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            background: var(--pure-white);
+            border-bottom: 1px solid var(--uber-black);
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1136px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-pills {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-pill {
+            background: var(--chip-gray);
+            color: var(--uber-black);
+            padding: 10px 20px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .nav-pill:hover {
+            background: var(--hover-gray);
+        }
+
+        .nav-pill.active {
+            background: var(--uber-black);
+            color: var(--pure-white);
+        }
+
+        /* Hero Section */
+        .hero {
+            max-width: 1136px;
+            margin: 0 auto;
+            padding: 80px 24px 60px;
+        }
+
+        .hero-title {
+            font-size: clamp(36px, 5vw, 52px);
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+            color: var(--body-gray);
+            max-width: 480px;
+            margin-bottom: 48px;
+        }
+
+        /* Input Section */
+        .input-section {
+            max-width: 1136px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .input-card {
+            background: var(--pure-white);
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: var(--shadow-light) 0 4px 16px 0;
+            margin-bottom: 40px;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--body-gray);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 16px;
+            font-family: inherit;
+            border: 1px solid var(--uber-black);
+            border-radius: 8px;
+            background: var(--pure-white);
+            transition: all 0.2s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-field::placeholder {
+            color: var(--muted-gray);
+        }
+
+        .button-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        .btn {
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 500;
+            font-family: inherit;
+            border: none;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+        }
+
+        .btn-primary {
+            background: var(--uber-black);
+            color: var(--pure-white);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--body-gray);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--pure-white);
+            color: var(--uber-black);
+            border: 1px solid var(--uber-black);
+        }
+
+        .btn-secondary:hover {
+            background: var(--hover-gray);
+        }
+
+        /* Results Section */
+        .results-section {
+            max-width: 1136px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+            display: none;
+        }
+
+        .results-section.visible {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card {
+            background: var(--pure-white);
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: var(--shadow-light) 0 4px 16px 0;
+            margin-bottom: 24px;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--chip-gray);
+        }
+
+        .result-nik {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+
+        .validation-badge {
+            padding: 8px 20px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .validation-badge.valid {
+            background: var(--success);
+            color: var(--pure-white);
+        }
+
+        .validation-badge.mismatch {
+            background: #ff6b35;
+            color: var(--pure-white);
+        }
+
+        .validation-badge.error {
+            background: var(--error);
+            color: var(--pure-white);
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .result-item {
+            padding: 16px;
+            background: var(--chip-gray);
+            border-radius: 8px;
+        }
+
+        .result-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--muted-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .result-value.large {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .location-section {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--chip-gray);
+        }
+
+        .location-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--muted-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+
+        .location-item {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .location-code {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+            font-size: 12px;
+            color: var(--muted-gray);
+            background: var(--pure-white);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .location-name {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* Additional Info */
+        .additional-section {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--chip-gray);
+        }
+
+        .additional-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .additional-item {
+            padding: 16px;
+            background: var(--pure-white);
+            border: 1px solid var(--chip-gray);
+            border-radius: 8px;
+        }
+
+        .additional-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--muted-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+
+        .additional-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Loading State */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.visible {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--chip-gray);
+            border-top-color: var(--uber-black);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Error State */
+        .error-message {
+            display: none;
+            background: var(--error);
+            color: var(--pure-white);
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .error-message.visible {
+            display: block;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Footer */
+        footer {
+            background: var(--uber-black);
+            color: var(--pure-white);
+            padding: 48px 24px;
+        }
+
+        .footer-container {
+            max-width: 1136px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 32px;
+        }
+
+        .footer-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .footer-link {
+            display: block;
+            color: var(--muted-gray);
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 8px;
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--pure-white);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 40px 16px 32px;
+            }
+
+            .hero-title {
+                font-size: 32px;
+            }
+
+            .input-card {
+                padding: 24px;
+            }
+
+            .result-card {
+                padding: 24px;
+            }
+
+            .result-nik {
+                font-size: 24px;
+            }
+
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-row {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .nav-container {
+                padding: 12px 16px;
+            }
+
+            .nav-pills {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="logo">NIK Parser</div>
+            <div class="nav-pills">
+                <a href="#" class="nav-pill active">Parser</a>
+                <a href="#" class="nav-pill">Tentang</a>
+                <a href="#" class="nav-pill">API</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1 class="hero-title">Validasi NIK Indonesia</h1>
+        <p class="hero-subtitle">Parse Nomor Induk Kependudukan 16 digit untuk melihat informasi biodata, wilayah, dan validasi tanggal lahir.</p>
+    </section>
+
+    <section class="input-section">
+        <div class="input-card">
+            <div class="error-message" id="errorMessage"></div>
+
+            <div class="input-group">
+                <label class="input-label" for="nikInput">Nomor NIK (16 digit)</label>
+                <input
+                    type="text"
+                    id="nikInput"
+                    class="input-field"
+                    placeholder="Contoh: 3173086804790005"
+                    maxlength="16"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                >
+            </div>
+
+            <div class="input-group">
+                <label class="input-label" for="dobInput">Tanggal Lahir (opsional, untuk verifikasi)</label>
+                <input
+                    type="date"
+                    id="dobInput"
+                    class="input-field"
+                >
+            </div>
+
+            <div class="input-group">
+                <label class="input-label" for="apiKeyInput">API Key (opsional)</label>
+                <input
+                    type="password"
+                    id="apiKeyInput"
+                    class="input-field"
+                    placeholder="Masukkan API key jika diperlukan"
+                >
+            </div>
+
+            <div class="button-row">
+                <button class="btn btn-primary" id="parseBtn" onclick="parseNIK()">
+                    Parse NIK
+                </button>
+                <button class="btn btn-secondary" onclick="clearForm()">
+                    Reset
+                </button>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+        </div>
+    </section>
+
+    <section class="results-section" id="results">
+        <div class="result-card">
+            <div class="result-header">
+                <div class="result-nik" id="resultNik">3173086804790005</div>
+                <div class="validation-badge" id="validationBadge">Valid</div>
+            </div>
+
+            <div class="result-grid">
+                <div class="result-item">
+                    <div class="result-label">Jenis Kelamin</div>
+                    <div class="result-value large" id="resultGender">PEREMPUAN</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Tanggal Lahir</div>
+                    <div class="result-value large" id="resultBirth">28 April 1979</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Umur</div>
+                    <div class="result-value" id="resultAge">47 Tahun</div>
+                </div>
+            </div>
+
+            <div class="location-section">
+                <div class="location-title">Wilayah</div>
+                <div class="location-item">
+                    <span class="location-code">31</span>
+                    <span class="location-name" id="resultProvince">DKI JAKARTA</span>
+                </div>
+                <div class="location-item">
+                    <span class="location-code">31.73</span>
+                    <span class="location-name" id="resultRegency">KOTA JAKARTA PUSAT</span>
+                </div>
+                <div class="location-item">
+                    <span class="location-code">31.73.08</span>
+                    <span class="location-name" id="resultDistrict">GAMBIR</span>
+                </div>
+            </div>
+
+            <div class="additional-section">
+                <div class="additional-grid">
+                    <div class="additional-item">
+                        <div class="additional-label">Zodiak</div>
+                        <div class="additional-value" id="resultZodiac">Taurus</div>
+                    </div>
+                    <div class="additional-item">
+                        <div class="additional-label">Pasaran Jawa</div>
+                        <div class="additional-value" id="resultPasaran">Sabtu Pon</div>
+                    </div>
+                    <div class="additional-item">
+                        <div class="additional-label">Kategori Usia</div>
+                        <div class="additional-value" id="resultAgeCategory">Paruh Baya</div>
+                    </div>
+                    <div class="additional-item">
+                        <div class="additional-label">Nomor Urut</div>
+                        <div class="additional-value" id="resultSequence">0005</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-container">
+            <div>
+                <div class="footer-title">NIK Parser</div>
+                <a class="footer-link">API Dokumentasi</a>
+                <a class="footer-link">GitHub</a>
+            </div>
+            <div>
+                <div class="footer-title">Tentang</div>
+                <a class="footer-link">Cara Kerja</a>
+                <a class="footer-link">Privasi</a>
+            </div>
+            <div>
+                <div class="footer-title">Data Wilayah</div>
+                <a class="footer-link">7.071 Kecamatan</a>
+                <a class="footer-link">Seluruh Indonesia</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const API_BASE = '/api/v1';
+        const API_KEY_STORAGE = 'nik_parser_api_key';
+
+        // Load saved API key on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedKey = localStorage.getItem(API_KEY_STORAGE);
+            if (savedKey) {
+                document.getElementById('apiKeyInput').value = savedKey;
+            }
+        });
+
+        // Auto-format NIK input
+        document.getElementById('nikInput').addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '').slice(0, 16);
+        });
+
+        // Allow Enter key to submit
+        document.getElementById('nikInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') parseNIK();
+        });
+
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.textContent = message;
+            errorEl.classList.add('visible');
+            setTimeout(() => errorEl.classList.remove('visible'), 5000);
+        }
+
+        function clearError() {
+            document.getElementById('errorMessage').classList.remove('visible');
+        }
+
+        async function parseNIK() {
+            const nik = document.getElementById('nikInput').value.trim();
+            const dob = document.getElementById('dobInput').value;
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+
+            clearError();
+
+            if (nik.length !== 16) {
+                showError('NIK harus 16 digit angka');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loading').classList.add('visible');
+            document.getElementById('results').classList.remove('visible');
+            document.getElementById('parseBtn').disabled = true;
+
+            try {
+                const url = new URL(`${API_BASE}/parse`, window.location.origin);
+                url.searchParams.append('nik', nik);
+                if (dob) url.searchParams.append('tanggal_lahir', dob);
+
+                const headers = {};
+                if (apiKey) headers['X-API-Key'] = apiKey;
+
+                const response = await fetch(url, { headers });
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error ? `${data.error}: ${data.message}` : data.message || 'Terjadi kesalahan');
+                }
+
+                displayResults(data);
+
+                // Save API key for future use
+                if (apiKey) {
+                    localStorage.setItem(API_KEY_STORAGE, apiKey);
+                }
+            } catch (error) {
+                showError(error.message || 'Gagal mengambil data. Pastikan server berjalan.');
+            } finally {
+                document.getElementById('loading').classList.remove('visible');
+                document.getElementById('parseBtn').disabled = false;
+            }
+        }
+
+        function displayResults(data) {
+            // Basic info
+            document.getElementById('resultNik').textContent = data.nik;
+            document.getElementById('resultGender').textContent = data.kelamin;
+            document.getElementById('resultBirth').textContent = data.lahir_lengkap;
+            document.getElementById('resultSequence').textContent = data.nomor_urut;
+
+            // Location
+            document.getElementById('resultProvince').textContent = data.provinsi.nama;
+            document.getElementById('resultRegency').textContent = data.kotakab.nama;
+            document.getElementById('resultDistrict').textContent = data.kecamatan.nama;
+
+            // Additional info
+            document.getElementById('resultAge').textContent = data.tambahan.usia;
+            document.getElementById('resultAgeCategory').textContent = data.tambahan.kategori_usia;
+            document.getElementById('resultZodiac').textContent = data.tambahan.zodiak;
+
+            // Pasaran - extract day name
+            const pasaranFull = data.tambahan.pasaran;
+            const pasaranShort = pasaranFull.split(',').slice(0, 2).join(',');
+            document.getElementById('resultPasaran').textContent = pasaranShort;
+
+            // Validation badge
+            const badge = document.getElementById('validationBadge');
+            badge.className = 'validation-badge';
+
+            if (data.validasi.status === 'valid') {
+                badge.classList.add('valid');
+                badge.textContent = data.validasi.reason === 'dob_verified' ? 'Terverifikasi' : 'Valid';
+            } else if (data.validasi.status === 'mismatch') {
+                badge.classList.add('mismatch');
+                badge.textContent = 'Tidak Cocok';
+            } else {
+                badge.classList.add('error');
+                badge.textContent = 'Error';
+            }
+
+            // Show results
+            document.getElementById('results').classList.add('visible');
+        }
+
+        function clearForm() {
+            document.getElementById('nikInput').value = '';
+            document.getElementById('dobInput').value = '';
+            document.getElementById('results').classList.remove('visible');
+            clearError();
+        }
+    </script>
+</body>
+</html>

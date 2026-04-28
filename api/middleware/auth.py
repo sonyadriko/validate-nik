@@ -23,8 +23,12 @@ class APIKeyMiddleware(BaseHTTPMiddleware):
         return [k.strip() for k in keys_str.split(",") if k.strip()]
 
     async def dispatch(self, request: Request, call_next):
-        # Skip auth for health check and docs
-        if request.url.path in ["/api/v1/health", "/docs", "/redoc", "/openapi.json", "/"]:
+        # Skip auth for health check, docs, static files, and favicon
+        skip_paths = {
+            "/api/v1/health", "/docs", "/redoc", "/openapi.json", "/",
+            "/static", "/favicon.ico"
+        }
+        if request.url.path in skip_paths or request.url.path.startswith("/static"):
             return await call_next(request)
 
         # Get API key from header
